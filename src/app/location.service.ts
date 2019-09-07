@@ -36,11 +36,13 @@ export class LocationService {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
 
+              this.nUIService.showSnackbar('Track Position', null, 1000);
               const Location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
               Gmap.panTo(Location);
               Gmarker = new google.maps.Marker({
               position: Location,
               map: Gmap,
+              icon: { url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'}
            });
         });
         } else { alert('Geolocation is not supported by this browser.');
