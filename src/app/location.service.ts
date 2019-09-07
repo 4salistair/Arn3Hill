@@ -31,20 +31,22 @@ export class LocationService {
 
 
     findMe( Gmap: google.maps.Map, Gmarker: google.maps.Marker) {
-      if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((position) => {
 
-            const Fixedlocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-            Gmap.panTo(Fixedlocation);
-            Gmarker = new google.maps.Marker({
-            position: Fixedlocation,
-            map: Gmap,
-            });
-      });
-      } else { alert('Geolocation is not supported by this browser.');
+      const timerId  = setInterval(() => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+
+              const Location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+              Gmap.panTo(Location);
+              Gmarker = new google.maps.Marker({
+              position: Location,
+              map: Gmap,
+           });
+        });
+        } else { alert('Geolocation is not supported by this browser.');
         }
-
-      }
+      }, 1000 ) ;
+    }
 
 
 
