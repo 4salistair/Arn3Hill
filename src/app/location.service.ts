@@ -81,6 +81,7 @@ export class LocationService {
         return docData.map(doc => {
                 return {
                     id:  doc.payload.doc.id,
+                    name: doc.payload.doc.data()['Name'],
                     lat: doc.payload.doc.data()['lat'],
                     lng: doc.payload.doc.data()['lng'],
                     description: doc.payload.doc.data()['Description']
@@ -106,7 +107,7 @@ export class LocationService {
             Gmap.panTo(Fixedlocation);
             Gmarker = new google.maps.Marker({
                position: Fixedlocation,
-               label: element.description,
+               label: element.name,
                map: Gmap,
               });
 
