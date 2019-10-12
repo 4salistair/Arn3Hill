@@ -135,7 +135,7 @@ export class LocationService {
             if (position.coords.longitude.toFixed(3) === element.lng.toFixed(3) &&
               position.coords.longitude.toFixed(3) === element.lng.toFixed(3)) {
 
-              this.nUIService.showSnackbar('Your are at the ' + element.description, null, 5000);
+              this.nUIService.showSnackbar('Your are at the ' + element.description, null, 10000);
             }
 
           });
