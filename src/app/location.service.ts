@@ -102,11 +102,11 @@ export class LocationService {
     this.fixedlocationsSubscription = this.stageChanged.subscribe(
       ( fixedLocation: Stage[]) => {
         fixedLocation.forEach( element => {
-            //console.log(element.lat + '  ' + element.lng + '  ' + element.description);
             const Fixedlocation = new google.maps.LatLng(element.lat , element.lng);
             Gmap.panTo(Fixedlocation);
             Gmarker = new google.maps.Marker({
                position: Fixedlocation,
+               label: element.description,
                map: Gmap,
               });
 
