@@ -61,7 +61,7 @@ export class LocationService {
       position: location,
       map: Gmap,
       title: 'Got you!',
-      icon: '/assets/blue-dot.png'
+      icon: '/assets/BlueDot.png'
      });
 } else {
       this.Memarker.setPosition(location);
@@ -108,7 +108,8 @@ export class LocationService {
             Gmarker = new google.maps.Marker({
                position: Fixedlocation,
                label: element.name,
-               map: Gmap,
+               icon: { url: '/assets/RedDot.png', labelOrigin: new google.maps.Point(element.lat + 1, element.lng + 1)},
+               map: Gmap
               });
 
 
