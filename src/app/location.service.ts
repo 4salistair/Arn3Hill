@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { Subscription} from 'rxjs';
 import { UIService } from './uiservice';
 import { Stage } from './stage.model';
+import { MAT_BUTTON_TOGGLE_DEFAULT_OPTIONS } from '@angular/material';
 
 
 @Injectable()
@@ -25,34 +26,54 @@ export class LocationService {
     private locationsSubscription: Subscription;
     private  fixedlocationsSubscription: Subscription;
 
+
+    Memap: google.maps.Map;
+    Memarker: google.maps.Marker;
+    Meposition: Geolocation;
+
+    currentLong: number;
+    currentLat: number;
+
     constructor(private db: AngularFirestore,
                 private nUIService: UIService
                 ) { }
 
 
-    findMe( Gmap: google.maps.Map, Gmarker: google.maps.Marker) {
+  trackMe( Gmap: google.maps.Map) {
 
-      const timerId  = setInterval(() => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-
-              this.nUIService.showSnackbar('Track Position', null, 1000);
-              const Location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-              Gmap.panTo(Location);
-              Gmarker = new google.maps.Marker({
-              position: Location,
-              map: Gmap,
-              icon: { url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'}
-           });
-        });
-        } else { alert('Geolocation is not supported by this browser.');
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition((position) => {
+        if (this.Memarker) {
+          this.Memarker.setPosition(null);
         }
-      }, 1000 ) ;
-    }
+        this.showTrackingPosition(position, Gmap); });
+    } else { alert('Geolocation is not supported by this browser.'); }
+  }
+
+
+  showTrackingPosition(position, Gmap: google.maps.Map) {
+    this.currentLat = position.coords.latitude;
+    this.currentLong = position.coords.longitude;
+    const location = new google.maps.LatLng(this.currentLat, this.currentLong);
+
+    if (!this.Memarker) {
+    this.Memarker = new google.maps.Marker({
+      position: location,
+      map: Gmap,
+      title: 'Got you!',
+      icon: '/assets/blue-dot.png'
+     });
+} else {
+      this.Memarker.setPosition(location);
+  }
+}
 
 
 
-    fetchlocations(Gmap: google.maps.Map, Gmarker: google.maps.Marker) {
+
+
+
+  fetchlocations(Gmap: google.maps.Map, Gmarker: google.maps.Marker) {
       this.fbSubs.push(this.db
         .collection('Locations')
         .snapshotChanges()
@@ -99,33 +120,95 @@ export class LocationService {
     this.locationsSubscription = this.stageChanged.subscribe(
       ( fixedLocation: Stage[]) => {
         fixedLocation.forEach(element => {
-          console.log(element.lat.toFixed(4) + '  ' + element.lng.toFixed(4) + '  ' + element.description);
+         console.log(element.lat.toFixed(4));
+         console.log(element.lng.toFixed(4));
 
-          const timerId  = setInterval(() => {
-            this.nUIService.showSnackbar('Your are at the no where', null, 3000);
 
-            if (navigator.geolocation) {
-                  navigator.geolocation.getCurrentPosition((position) => {
-                    //  console.log('You are here');
-                    //  console.log(position.coords.latitude.toFixed(4))
-                    //  console.log(position.coords.longitude.toFixed(4));
-                    //  console.log(element.description);
-                    //  console.log(element.lng.toFixed(4));
-                    //  console.log(element.lat.toFixed(4));
-                    this.nUIService.showSnackbar('Your are at the no where', null, 2000);
+         if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((position) => {
+            console.log('You are here');
+            console.log(position.coords.latitude.toFixed(4));
+            console.log(position.coords.longitude.toFixed(4));
 
-                    if (position.coords.longitude.toFixed(4) === element.lng.toFixed(4) &&
-                        position.coords.longitude.toFixed(4) === element.lng.toFixed(4)) {
+            if (position.coords.longitude.toFixed(3) === element.lng.toFixed(3) &&
+              position.coords.longitude.toFixed(3) === element.lng.toFixed(3)) {
 
-                        this.nUIService.showSnackbar('Your are at the ' + element.description, null, 2000);
-                      }
-                  });
-          }
-        }, 4000 ) ;
-      });
-    });
-  }
+              this.nUIService.showSnackbar('Your are at the ' + element.description, null, 5000);
+            }
+
+          });
+        }
+
+
+
+          });
+        });
+      }
 }
+
+
+  // trackMe() {
+  //   if (navigator.geolocation) {
+  //     this.isTracking = true;
+  //     navigator.geolocation.watchPosition((position) => {
+  //       this.showTrackingPosition(position);
+  //     });
+  //   } else {
+  //     alert("Geolocation is not supported by this browser.");
+  //   }
+  // }
+
+/////
+
+  //   findMe( Memap: google.maps.Map) {
+  //   const timerId  = setInterval(() => {
+
+
+  //     if (navigator.geolocation) {
+  //           navigator.geolocation.getCurrentPosition((position) => {
+
+  //             const Location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+  //             Memap.panTo(Location);
+  //             this.Memarker = new google.maps.Marker({
+  //             position: Location,
+  //             map: Memap,
+  //             icon: { url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'}
+  //             });
+  //       });
+
+  //     } else { alert('Geolocation is not supported by this browser.');
+
+  //     }
+  //   }, 5000 ) ;
+  // }
+         // + '  ' + element.lng.toFixed(4) + '  ' + element.description);
+
+
+              // if (navigator.geolocation) {
+              //   navigator.geolocation.getCurrentPosition((position) => {
+              //     console.log('You are here');
+              //     console.log(position.coords.latitude.toFixed(4))
+              //     console.log(position.coords.longitude.toFixed(4))
+              //   }
+              // };
+              
+  //                    console.log(element.description);
+  //                    console.log(element.lng.toFixed(4));
+  //                    console.log(element.lat.toFixed(4));
+  //                   this.nUIService.showSnackbar('Your are at the no where', null, 2000);
+
+  //                   if (position.coords.longitude.toFixed(4) === element.lng.toFixed(4) &&
+  //                       position.coords.longitude.toFixed(4) === element.lng.toFixed(4)) {
+
+  //                       this.nUIService.showSnackbar('Your are at the ' + element.description, null, 2000);
+  //         }
+  //               });
+  //         }
+  //         }, 4000 ) ;
+  //     });
+//      });
+//    }
+// }
 
          //       && position.coords.longitude.toFixed(4) === element.lng.toFixed(4))
                   

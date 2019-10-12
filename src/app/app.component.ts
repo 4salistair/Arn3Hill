@@ -30,7 +30,7 @@ export class AppComponent implements OnInit {
   location: string;
   Fixedposition: Geolocation;
 
-  map: google.maps.Map;
+  gmap: google.maps.Map;
   marker: google.maps.Marker;
   position: Geolocation;
 
@@ -46,24 +46,17 @@ export class AppComponent implements OnInit {
       mapTypeId: google.maps.MapTypeId.TERRAIN,
       setOptions: google.maps.BicyclingLayer
     };
-
-    this.map = new google.maps.Map(this.gmapElement.nativeElement, mapProp);
     this.nAuthService.AnnonLogin();
 
-    this.nLocationService.findMe(this.map, this.marker);
-    this.nLocationService.fetchlocations(this.map, this.marker);
-    this.nLocationService.showFixedPosition(this.map, this.marker);
-    this.nLocationService.matchLocation();
+    this.gmap = new google.maps.Map(this.gmapElement.nativeElement, mapProp);
 
+    this.nLocationService.trackMe(this.gmap);
+    this.nLocationService.fetchlocations(this.gmap, this.marker);
+    this.nLocationService.showFixedPosition(this.gmap, this.marker);
 
-    // const timerId  = setInterval(() => {
+    const timerId  = setInterval(() => {
+        this.nLocationService.matchLocation();
+      }, 1000 );
 
-    
-    // //   this.nLocationService.findMe(this.map, this.marker);
-    // //   this.nLocationService.fetchlocations(this.map, this.marker);
-    //    this.nUIService.showSnackbar(' Snack bar attack :]', null , 1000);
-    //   }, 10000);
-
-
-  }
+}
 }
