@@ -1,16 +1,13 @@
 
 export interface Stage {
-    id: string;
-    name: string;
-    lat: number;
-    lng: number;
-    description: string;
-    user?: string;
-    stage?: string;
-    startlocation?: string;
-    endlocation?: string;
+    // id: string?;
+    userSessionID?: string;
+    startID?: string;
+    startName?: string;
+    endID?: string;
+    endName?: string;
     startdateandtime?: any;
     enddateandtime?: any;
-    duration: number;
+    duration?: number;
     state?: 'completed'| 'cancalled' | null;
     }

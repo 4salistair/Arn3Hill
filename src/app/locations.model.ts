@@ -1,8 +1,10 @@
 export interface Locations {
 id: string;
-// name: string;
-// description: string;
-long: number;
+description: string;
+ // geodata: geopoint;
+name: string;
 lat: number;
+lng: number;
+
 }
 

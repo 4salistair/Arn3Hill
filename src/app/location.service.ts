@@ -1,19 +1,18 @@
-import { map, timestamp } from 'rxjs/operators';
-import { Injectable } from '@angular/core';
+import { map } from 'rxjs/operators';
+import { Injectable, EventEmitter,  OnDestroy} from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { Locations} from './locations.model';
+import { Locations } from './locations.model';
 import { Subject } from 'rxjs';
 import { Subscription} from 'rxjs';
-import { UIService } from './uiservice';
 import { Stage } from './stage.model';
-import { MAT_BUTTON_TOGGLE_DEFAULT_OPTIONS } from '@angular/material';
+import { MatSnackBar, MatDialog } from '@angular/material';
 
 
 @Injectable()
-export class LocationService {
+export class LocationService implements  OnDestroy {
 
     LocationChanged = new Subject<Locations[]>();
-    private availableStages: Stage[] = [];
+    private availableLocations: Locations[] = [];
 
     id: string;
     lat: number;
@@ -21,10 +20,17 @@ export class LocationService {
     description: any;
     latitudeFloat: string;
     stageModel: Stage[];
-    stageChanged = new Subject<Stage[]>();
+    currentMatchedLocation: Stage;
+    locationChanged = new Subject<Locations[]>();
+
+
+    matchedLocation = new Subject<Stage>();
+    LocationFoundEmitter = new EventEmitter<boolean>();
+
     private fbSubs: Subscription[] = [];
     private locationsSubscription: Subscription;
     private  fixedlocationsSubscription: Subscription;
+    private  returnfixedlocationsSubscription: Subscription;
 
 
     Memap: google.maps.Map;
@@ -33,14 +39,15 @@ export class LocationService {
 
     currentLong: number;
     currentLat: number;
+    returnArray: Stage[] = [];
 
     constructor(private db: AngularFirestore,
-                private nUIService: UIService
+                public dialog: MatDialog,
+                private snackbar: MatSnackBar
                 ) { }
 
 
   trackMe( Gmap: google.maps.Map) {
-
     if (navigator.geolocation) {
       navigator.geolocation.watchPosition((position) => {
         if (this.Memarker) {
@@ -69,10 +76,6 @@ export class LocationService {
 }
 
 
-
-
-
-
   fetchlocations(Gmap: google.maps.Map, Gmarker: google.maps.Marker) {
       this.fbSubs.push(this.db
         .collection('Locations')
@@ -89,19 +92,19 @@ export class LocationService {
                   });
                 })
                 )
-                .subscribe((stages: Stage[]) => {
-                this.availableStages = stages;
-                this.stageChanged.next([...this.availableStages]);
+                .subscribe((locations: Locations[]) => {
+                this.availableLocations = locations;
+                this.locationChanged.next([...this.availableLocations]);
               }, error => {
-                this.nUIService.showSnackbar('Fetching Exercises Failed', null, 3000);
+              //  this.showSnackbar('Fetching Exercises Failed', null, 3000);
               }));
 
             }
 
   showFixedPosition(Gmap: google.maps.Map, Gmarker: google.maps.Marker) {
 
-    this.fixedlocationsSubscription = this.stageChanged.subscribe(
-      ( fixedLocation: Stage[]) => {
+    this.fixedlocationsSubscription = this.locationChanged.subscribe(
+      ( fixedLocation: Locations[]) => {
         fixedLocation.forEach( element => {
             const Fixedlocation = new google.maps.LatLng(element.lat , element.lng);
             Gmap.panTo(Fixedlocation);
@@ -117,37 +120,61 @@ export class LocationService {
       });
     }
 
-
   matchLocation() {
-    this.locationsSubscription = this.stageChanged.subscribe(
-      ( fixedLocation: Stage[]) => {
-        fixedLocation.forEach(element => {
-         console.log(element.lat.toFixed(4));
-         console.log(element.lng.toFixed(4));
+    let count: any;
+    count = 0;
 
+    this.locationsSubscription = this.locationChanged.subscribe(
+      ( fixedLocation: Locations[]) => {
+        const timerId  = setInterval(() => {
 
-         if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((position) => {
-            console.log('You are here');
-            console.log(position.coords.latitude.toFixed(4));
-            console.log(position.coords.longitude.toFixed(4));
+        fixedLocation.forEach(element2 => {
+          count = count ++;
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
 
-            if (position.coords.longitude.toFixed(3) === element.lng.toFixed(3) &&
-              position.coords.longitude.toFixed(3) === element.lng.toFixed(3)) {
+              this.LocationFoundEmitter.next(true);
 
-              this.nUIService.showSnackbar('Your are at the ' + element.description, null, 10000);
-            }
+             // if (position.coords.longitude.toFixed(3) === element2.lng.toFixed(3) &&
+             //     position.coords.longitude.toFixed(3) === element2.lng.toFixed(3)) {
 
-          });
-        }
+                  //  this.currentMatchedLocation  = {startID: element2.id, startName: element2.name} ;
+                  //  this.matchedLocation.next(this.currentMatchedLocation);
 
+                   //
+                 // return; /// Need to stop this firing
+            //  }
 
-
-          });
+            });
+           }
         });
-      }
+      }, 300);
+    });
+    
+       // this.nLocationService.matchLocation();
+  }
+  ngOnDestroy() {
+
+
+  }
+
 }
 
+  /// returnFixedLocationArray( ) {
+  //   this.fixedlocationsSubscription = this.stageChanged.subscribe(
+  //     ( fixedLocation2: Stage[]) => {
+
+  //       this.returnArray = fixedLocation2;
+
+  //       this.returnArray.forEach(element2 => {
+
+  //       //  console.log(element2.name);
+
+  //       });
+  //     });
+  //  // console.log(this.returnArray);
+  //   return this.returnArray;
+  // }
 
   // trackMe() {
   //   if (navigator.geolocation) {
@@ -318,7 +345,7 @@ export class LocationService {
   //   this.marker.setPosition(location);
   // }
 
-//}
+// }
 
 
 // const location = new google.maps.LatLng(this.lat, this.lng);    
@@ -341,7 +368,7 @@ export class LocationService {
 //   this.marker.setPosition(Fixedlocation);
 // }
 
-//}
+// }
 
 
 

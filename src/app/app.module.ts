@@ -10,15 +10,22 @@ import { environment } from '../environments/environment';
 
 import { AuthService } from './auth.service';
 import { LocationService} from './location.service';
-import { UIService } from './uiservice';
+import { UIService } from './ui.service';
+import { DataService } from './data.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 
+import { MaterialModule } from './material.module';
 import { MatSnackBarModule } from '@angular/material';
+import { StageTimerComponent } from './stage-timer/app-stage-timer.component';
+import { LocationComponent } from './stage-timer/app-location-component';
 
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    StageTimerComponent,
+    LocationComponent
+
   ],
   imports: [
     BrowserModule,
@@ -26,10 +33,13 @@ import { MatSnackBarModule } from '@angular/material';
     AngularFirestoreModule,
     AngularFireAuthModule,
     MatSnackBarModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    MaterialModule,
   ],
-  providers: [LocationService, AuthService, UIService],
-  bootstrap: [AppComponent]
+  providers: [LocationService, AuthService, UIService, DataService],
+  bootstrap: [AppComponent],
+  entryComponents: [LocationComponent]
+
 })
 export class AppModule {
 
