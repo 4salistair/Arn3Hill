@@ -135,15 +135,14 @@ export class LocationService implements  OnDestroy {
 
               this.LocationFoundEmitter.next(true);
 
-             // if (position.coords.longitude.toFixed(3) === element2.lng.toFixed(3) &&
-             //     position.coords.longitude.toFixed(3) === element2.lng.toFixed(3)) {
+              if (position.coords.longitude.toFixed(3) === element2.lng.toFixed(3) &&
+                  position.coords.longitude.toFixed(3) === element2.lng.toFixed(3)) {
 
-                  //  this.currentMatchedLocation  = {startID: element2.id, startName: element2.name} ;
-                  //  this.matchedLocation.next(this.currentMatchedLocation);
+                    this.currentMatchedLocation  = {startID: element2.id, startName: element2.name} ;
+                    this.matchedLocation.next(this.currentMatchedLocation);
 
-                   //
                  // return; /// Need to stop this firing
-            //  }
+              }
 
             });
            }
