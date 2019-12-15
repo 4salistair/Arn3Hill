@@ -36,7 +36,7 @@ import { LocationComponent } from './stage-timer/app-location-component';
     BrowserAnimationsModule,
     MaterialModule,
   ],
-  providers: [LocationService, AuthService, UIService, DataService],
+  providers: [LocationService, AuthService, UIService, DataService, LocationComponent],
   bootstrap: [AppComponent],
   entryComponents: [LocationComponent]
 

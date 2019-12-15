@@ -125,31 +125,32 @@ export class LocationService implements  OnDestroy {
     count = 0;
 
     this.locationsSubscription = this.locationChanged.subscribe(
-      ( fixedLocation: Locations[]) => {
-        const timerId  = setInterval(() => {
+     ( fixedLocation: Locations[]) => {
+    //   const timerId  = setInterval(() => {
 
-        fixedLocation.forEach(element2 => {
-          count = count ++;
+       fixedLocation.forEach(element2 => {
+          count = count + 1;
+          console.log( '1 ' + count  + element2.description);
           if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
-
-              this.LocationFoundEmitter.next(true);
 
               if (position.coords.longitude.toFixed(3) === element2.lng.toFixed(3) &&
                   position.coords.longitude.toFixed(3) === element2.lng.toFixed(3)) {
 
+                    console.log( ' so there is a location match ' + count  + element2.description);
+                    this.LocationFoundEmitter.next(true);
                     this.currentMatchedLocation  = {startID: element2.id, startName: element2.name} ;
                     this.matchedLocation.next(this.currentMatchedLocation);
-
-                 // return; /// Need to stop this firing
+                    console.log(count);
+      //              clearInterval(timerId);
               }
 
             });
            }
         });
-      }, 300);
+    //   }, 10);
     });
-    
+
        // this.nLocationService.matchLocation();
   }
   ngOnDestroy() {

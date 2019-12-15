@@ -342,8 +342,10 @@ export class AppComponent implements OnInit {
     console.log('fetch locations');
     this.nLocationService.showFixedPosition(this.gmap, this.marker);
     console.log('fixing locations');
+
+   // const timerId  = setInterval(() => {
     this.nLocationService.matchLocation();
     console.log('matching locations');
-
+  //  }, 100);
 }
 }
